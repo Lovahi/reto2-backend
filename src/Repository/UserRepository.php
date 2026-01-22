@@ -61,4 +61,14 @@ class UserRepository {
         $stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
         return $stmt->execute(['id' => $id]);
     }
+
+    public function getUserByEmail(string $email): ?User {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->execute(['email' => $email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) return null;
+
+        return new User((int)$row['id'], $row['username'], $row['email'], $row['password_hash'], Role::from($row['role']));
+    }
 }

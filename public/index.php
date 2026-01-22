@@ -3,7 +3,9 @@
 use App\Core\Router;
 use App\Core\Database;
 use App\Controller\UserController;
+use App\Controller\AuthController;
 use App\Service\UserService;
+use App\Service\AuthService;
 use App\Repository\UserRepository;
 
 // 1. Configuración de cabeceras (CORS y JSON)
@@ -36,6 +38,9 @@ try {
     $userService = new UserService($userRepository);
     $userController = new UserController($userService);
 
+    $authService = new AuthService($userRepository, $userService);
+    $authController = new AuthController($authService);
+
     // 4. Configuración del Router
     $router = new Router();
 
@@ -45,6 +50,10 @@ try {
     $router->add('POST',   '/api/users',       [$userController, 'createUser']);
     $router->add('PUT',    '/api/users/{id}',  [$userController, 'updateUser']);
     $router->add('DELETE', '/api/users/{id}',  [$userController, 'deleteUser']);
+
+    // Auth API Routes
+    $router->add('POST',   '/api/auth/register', [$authController, 'register']);
+    $router->add('POST',   '/api/auth/login',    [$authController, 'login']);
 
     // ---- API Routes
 

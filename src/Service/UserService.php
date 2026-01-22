@@ -43,7 +43,7 @@ class UserService {
             $data['username'],
             $data['email'],
             $hashedPassword,
-            Role::USER
+            Role::from($data['role'])
         );
 
         return $this->userRepository->createUser($user);
