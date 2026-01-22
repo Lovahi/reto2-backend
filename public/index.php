@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 use App\Core\Router;
 use App\Core\Database;
 use App\Controller\UserController;
@@ -7,6 +9,8 @@ use App\Controller\AuthController;
 use App\Service\UserService;
 use App\Service\AuthService;
 use App\Repository\UserRepository;
+
+use App\Enum\Role;
 
 // 1. Configuración de cabeceras (CORS y JSON)
 header("Access-Control-Allow-Origin: *");
@@ -46,14 +50,15 @@ try {
 
     // User API Routes
     $router->add('GET',    '/api/users',       [$userController, 'getAllUsers']);
-    $router->add('GET',    '/api/users/{id}',  [$userController, 'getUserById']);
-    $router->add('POST',   '/api/users',       [$userController, 'createUser']);
-    $router->add('PUT',    '/api/users/{id}',  [$userController, 'updateUser']);
-    $router->add('DELETE', '/api/users/{id}',  [$userController, 'deleteUser']);
+    $router->add('GET',    '/api/users/{id}',  [$userController, 'getUserById'], ['auth' => true]);
+    $router->add('POST',   '/api/users',       [$userController, 'createUser'],  ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('PUT',    '/api/users/{id}',  [$userController, 'updateUser'],  ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('DELETE', '/api/users/{id}',  [$userController, 'deleteUser'],  ['auth' => true, 'role' => Role::ADMIN]);
 
     // Auth API Routes
     $router->add('POST',   '/api/auth/register', [$authController, 'register']);
     $router->add('POST',   '/api/auth/login',    [$authController, 'login']);
+    $router->add('POST',   '/api/auth/logout',   [$authController, 'logout']);
 
     // ---- API Routes
 

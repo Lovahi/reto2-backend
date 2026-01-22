@@ -17,12 +17,16 @@ class AuthService {
     }
 
     public function register(array $data): bool {
+        if (empty($data['password'])) {
+            throw new \Exception("Password is required");
+        }
 
+        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
         $user = new User(
             null,
             $data['username'],
             $data['email'],
-            $data['password'],
+            $hashedPassword,
             Role::USER
         );
 
@@ -33,6 +37,11 @@ class AuthService {
         $user = $this->userRepository->getUserByEmail($email);
         
         if ($user && password_verify($password, $user->getPassword())) {
+            // Guardar datos básicos en la sesión
+            $_SESSION['user_id'] = $user->getId();
+            $_SESSION['user_role'] = $user->getRole()->value;
+            $_SESSION['user_email'] = $user->getEmail();
+
             return new UserDTO(
                 $user->getId(),
                 $user->getUsername(),
@@ -42,5 +51,22 @@ class AuthService {
         }
 
         return null;
+    }
+
+    public function logout(): void {
+        session_unset();
+        session_destroy();
+    }
+
+    public static function isLoggedIn(): bool {
+        return isset($_SESSION['user_id']);
+    }
+
+    public static function hasRole(Role $role): bool {
+        return self::isLoggedIn() && $_SESSION['user_role'] === $role->value;
+    }
+
+    public static function isAdmin(): bool {
+        return self::hasRole(Role::ADMIN);
     }
 }

@@ -71,4 +71,9 @@ class AuthController {
             $this->jsonResponse(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function logout(): void {
+        $this->authService->logout();
+        $this->jsonResponse(['message' => 'Logged out successfully']);
+    }
 }
