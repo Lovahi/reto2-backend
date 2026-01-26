@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Model;
+
+use App\Enum\Type;
+
+class Event {
+    private ?int $id;
+    private string $title;
+    private Type $type;
+    private string $date;
+    private string $hour;
+    private string $availablePlaces;
+    private string $image;
+    private string $description;
+
+    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, string $availablePlaces, string $image, string $description) {
+        $this->id = $id;
+        $this->title = $title;
+        $this->type = $type;
+        $this->date = $date;
+        $this->hour = $hour;
+        $this->availablePlaces = $availablePlaces;
+        $this->image = $image;
+        $this->description = $description;
+    }
+
+    // Getters and Setters
+    public function getId(): ?int { return $this->id; }
+    public function setId(?int $id): void { $this->id = $id; }
+
+    public function getTitle(): string { return $this->title; }
+    public function setTitle(string $title): void { $this->title = $title; }
+
+    public function getType(): Type { return $this->type; }
+    public function setType(Type $type): void { $this->type = $type; }
+
+    public function getDate(): string { return $this->date; }
+    public function setDate(string $date): void { $this->date = $date; }
+
+    public function getHour(): string { return $this->hour; }
+    public function setHour(string $hour): void { $this->hour = $hour; }
+
+    public function getAvailablePlaces(): string { return $this->availablePlaces; }
+    public function setAvailablePlaces(string $availablePlaces): void { $this->availablePlaces = $availablePlaces; }
+
+    public function getImage(): string { return $this->image; }
+    public function setImage(string $image): void { $this->image = $image; }
+
+    public function getDescription(): string { return $this->description; }
+    public function setDescription(string $description): void { $this->description = $description; }
+
+    public function toArray(): array {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'type' => $this->type,
+            'date' => $this->date,
+            'hour' => $this->hour,
+            'availablePlaces' => $this->availablePlaces,
+            'image' => $this->image,
+            'description' => $this->description
+        ];
+    }
+}
