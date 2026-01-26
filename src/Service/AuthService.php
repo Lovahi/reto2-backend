@@ -21,7 +21,7 @@ class AuthService {
             throw new \Exception("Password is required");
         }
 
-        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+        $hashedPassword = \password_hash($data['password'], PASSWORD_BCRYPT);
         $user = new User(
             null,
             $data['username'],
@@ -36,7 +36,7 @@ class AuthService {
     public function login(string $email, string $password): ?UserDTO {
         $user = $this->userRepository->getUserByEmail($email);
         
-        if ($user && password_verify($password, $user->getPassword())) {
+        if ($user && \password_verify($password, $user->getPassword())) {
             // Guardar datos básicos en la sesión
             $_SESSION['user_id'] = $user->getId();
             $_SESSION['user_role'] = $user->getRole()->value;
@@ -54,8 +54,8 @@ class AuthService {
     }
 
     public function logout(): void {
-        session_unset();
-        session_destroy();
+        \session_unset();
+        \session_destroy();
     }
 
     public static function isLoggedIn(): bool {

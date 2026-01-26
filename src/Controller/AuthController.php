@@ -14,20 +14,20 @@ class AuthController {
     }
 
     private function jsonResponse(mixed $data, int $status = 200): void {
-        header('Content-Type: application/json; charset=UTF-8');
-        http_response_code($status);
-        echo json_encode($data);
+        \header('Content-Type: application/json; charset=UTF-8');
+        \http_response_code($status);
+        echo \json_encode($data);
     }
 
     private function getJsonInput(): ?array {
-        $json = file_get_contents('php://input');
-        return json_decode($json, true);
+        $json = \file_get_contents('php://input');
+        return \json_decode($json, true);
     }
 
     public function register(): void {
         $data = $this->getJsonInput();
 
-        if (!$data || !is_array($data)) {
+        if (!$data || !\is_array($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }

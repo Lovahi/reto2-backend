@@ -25,10 +25,13 @@ class UserController {
     }
 
     private function handleDatabaseException(PDOException $e): void {
-        if ($e->getCode() == 23000) {
-            $this->jsonResponse(['error' => 'The username or email is already in use'], 400);
-        } else {
-            $this->jsonResponse(['error' => 'A database error occurred'], 500);
+        switch ($e->getCode()) {
+            case 23000:
+                $this->jsonResponse(['error' => 'The username or email is already in use'], 400);
+                break;
+            default:
+                $this->jsonResponse(['error' => 'A database error occurred'], 500);
+                break;
         }
     }
 
@@ -50,7 +53,7 @@ class UserController {
     public function createUser(): void {
         $data = $this->getJsonInput();
         
-        if (!$data || !is_array($data)) {
+        if (!$data || !\is_array($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }
@@ -71,7 +74,7 @@ class UserController {
     public function updateUser(int $id): void {
         $data = $this->getJsonInput();
         
-        if (!$data || !is_array($data)) {
+        if (!$data || !\is_array($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }

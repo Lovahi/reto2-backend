@@ -18,26 +18,26 @@ class Router {
     }
 
     public function dispatch(string $method, string $uri): void {
-        $uri = explode('?', $uri)[0];
+        $uri = \explode('?', $uri)[0];
 
         foreach ($this->routes as $route) {
-            $pattern = preg_replace('/\{(\w+)\}/', '(\d+)', $route['path']);
+            $pattern = \preg_replace('/\{(\w+)\}/', '(\d+)', $route['path']);
             $pattern = "#^" . $pattern . "$#";
 
-            if ($route['method'] === $method && preg_match($pattern, $uri, $matches)) {
+            if ($route['method'] === $method && \preg_match($pattern, $uri, $matches)) {
                 // Check authorization
                 if (!$this->checkAuthorization($route['options'])) {
                     return;
                 }
 
-                array_shift($matches);
+                \array_shift($matches);
                 
                 $handler = $route['handler'];
-                if (is_array($handler)) {
+                if (\is_array($handler)) {
                     [$controller, $action] = $handler;
-                    call_user_func_array([$controller, $action], $matches);
+                    \call_user_func_array([$controller, $action], $matches);
                 } else {
-                    call_user_func_array($handler, $matches);
+                    \call_user_func_array($handler, $matches);
                 }
                 return;
             }
@@ -66,20 +66,20 @@ class Router {
     }
 
     private function sendUnauthorized(string $message): void {
-        http_response_code(401);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $message]);
+        \http_response_code(401);
+        \header('Content-Type: application/json');
+        echo \json_encode(['error' => $message]);
     }
 
     private function sendForbidden(string $message): void {
-        http_response_code(403);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $message]);
+        \http_response_code(403);
+        \header('Content-Type: application/json');
+        echo \json_encode(['error' => $message]);
     }
 
     private function sendNotFound(): void {
-        http_response_code(404);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => $message ?? 'Route not found']);
+        \http_response_code(404);
+        \header('Content-Type: application/json');
+        echo \json_encode(['error' => $message ?? 'Route not found']);
     }
 }
