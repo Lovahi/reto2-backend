@@ -69,4 +69,3 @@ class EventService {
         return $this->eventRepository->createEvent($event);
     }
 }
-?>

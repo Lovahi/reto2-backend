@@ -45,12 +45,13 @@ try {
     $userRepository = new UserRepository($db);
     $userService = new UserService($userRepository);
     $userController = new UserController($userService);
+    
+    $authService = new AuthService($userRepository, $userService);
+    $authController = new AuthController($authService);
+    
     $eventRepository = new EventRepository($db);
     $eventService = new EventService($eventRepository);
     $eventController = new EventController($eventService);
-
-    $authService = new AuthService($userRepository, $userService);
-    $authController = new AuthController($authService);
 
     // 4. Configuración del Router
     $router = new Router();
@@ -72,6 +73,8 @@ try {
     $router->add('GET',    '/api/events/{id}',               [$eventController, 'getEventById']);
     $router->add('GET',    '/api/events/title/{title}',      [$eventController, 'getEventsByName']);
     $router->add('POST',   '/api/events',                    [$eventController, 'createEvent'], ['auth' => true, 'role' => Role::ADMIN]);
+
+    // User-Events API Routes
 
     ///////////////////////////////////////////////////////////////////////
 
