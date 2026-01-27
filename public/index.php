@@ -68,6 +68,7 @@ try {
     $router->add('POST',   '/api/auth/logout',   [$authController, 'logout']);
     
     // Event API Routes
+    $router->add('GET',    '/api/events',                    [$eventController, 'getEvents']);
     $router->add('GET',    '/api/events/{id}',               [$eventController, 'getEventById']);
     $router->add('GET',    '/api/events/title/{title}',      [$eventController, 'getEventsByName']);
     $router->add('POST',   '/api/events',                    [$eventController, 'createEvent'], ['auth' => true, 'role' => Role::ADMIN]);

@@ -21,18 +21,32 @@ class EventService {
         return new EventDTO($event->getId(), $event->getTitle(), $event->getType(), $event->getDate(), $event->getHour(), $event->getAvailablePlaces(), $event->getImage(), $event->getDescription());
     }
 
+    public function getEventsPaginated(int $page): array {
+        $events = $this->eventRepository->getEventsPaginated($page);
+        return array_map(fn($event) => new EventDTO(
+            $event->getId(),
+            $event->getTitle(),
+            $event->getType(),
+            $event->getDate(),
+            $event->getHour(),
+            $event->getAvailablePlaces(),
+            $event->getImage(),
+            $event->getDescription()
+        ), $events);
+    }
+
     
-    public function getEventsByName(string $title): ?EventDTO {
+    public function getEventsByName(string $title): array {
         $events = $this->eventRepository->getEventsByTitle($title);
-        return array_map(fn($events) => new EventDTO(
-            $events->getId(),
-            $events->getTitle(),
-            $events->getType(),
-            $events->getDate(),
-            $events->getHour(),
-            $events->getAvailablePlaces(),
-            $events->getImage(),
-            $events->getDescription()
+        return array_map(fn($event) => new EventDTO(
+            $event->getId(),
+            $event->getTitle(),
+            $event->getType(),
+            $event->getDate(),
+            $event->getHour(),
+            $event->getAvailablePlaces(),
+            $event->getImage(),
+            $event->getDescription()
         ), $events);
     }
 

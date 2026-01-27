@@ -46,6 +46,17 @@ class EventController {
         }
     }
 
+    public function getEvents(): void {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $events = $this->eventService->getEventsPaginated($page);
+
+        if (!empty($events)) {
+            $this->jsonResponse(array_map(fn($e) => $e->toArray(), $events));
+        } else {
+            $this->jsonResponse(['error' => 'No events found for this page'], 404);
+        }
+    }
+
     public function getEventsByName(string $title): void {
         $events = $this->eventService->getEventsByName($title);
 
