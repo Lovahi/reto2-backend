@@ -32,24 +32,6 @@ class EventRepository {
         );
     }
 
-    public function getAllEvents(): array {
-        $stmt = $this->db->query("SELECT * FROM events");
-        $events = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $events[] = new Event(
-                (int)$row['id'], 
-                $row['titulo'], 
-                Type::from($row['tipo']), 
-                $row['fecha'], 
-                $row['hora'], 
-                (int)$row['plazasLibres'], 
-                $row['imagen'], 
-                $row['descripcion']
-            );
-        }
-        return $events;
-    }
-
     public function getEventsPaginated(int $page, int $limit = 9): array {
         $offset = ($page - 1) * $limit;
         $stmt = $this->db->prepare("SELECT * FROM events LIMIT :limit OFFSET :offset");
@@ -109,4 +91,3 @@ class EventRepository {
         return $result;
     }
 }
-?>
