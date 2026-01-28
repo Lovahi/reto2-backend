@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Service\EventService;
 use PDOException;
 use Exception;
+use App\Core\ApiResponseTrait;
 
 class EventController
 {
+    // use ApiResponseTrait;
     private EventService $eventService;
 
     public function __construct(EventService $eventService)
@@ -87,7 +89,6 @@ class EventController
         try {
             if ($this->eventService->createEvent($data)) {
                 $this->jsonResponse(['message' => 'Event created successfully'], 201);
-                echo json_encode($data);
             } else {
                 $this->jsonResponse(['error' => 'Failed to create event'], 400);
             }
@@ -126,7 +127,7 @@ class EventController
         }
     }
 
-  
+
     public function cancelSignup(int $eventId): void
     {
         $userId = $_SESSION['user_id'] ?? null;
