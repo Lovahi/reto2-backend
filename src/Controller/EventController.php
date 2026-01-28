@@ -16,8 +16,6 @@ class EventController {
         $this->eventService = $eventService;
     }
 
-
-
     public function getEventById(int $id): void {
         $event = $this->eventService->getEventById($id);
 
