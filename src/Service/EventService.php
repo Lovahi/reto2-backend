@@ -76,45 +76,84 @@ class EventService
         return $this->eventRepository->createEvent($event);
     }
 
-    public function signupUser(int $userId, int $eventId): array
+
+
+    public function inscribirUsuario(int $userId, int $eventId): array
     {
-        // 1. Verificar si el evento existe
-        $event = $this->getEventById($eventId);
-        if (!$event) {
-            return ['success' => false, 'message' => 'Evento no encontrado', 'code' => 404];
+        $eventoDTO = $this->getEventById($eventId);
+        if (!$eventoDTO) {
+            return [
+                'success' => false,
+                'message' => 'El evento no existe',
+                'code' => 404
+            ];
         }
 
-        // 2. Verificar plazas (aunque el repo también lo hace, es bueno comprobar antes)
-        if ($event->getAvailablePlaces() <= 0) {
-            return ['success' => false, 'message' => 'No hay plazas disponibles', 'code' => 409];
+        $estaInscrito = $this->eventRepository->verificarUsuarioRegistrado($userId, $eventId);
+        if ($estaInscrito) {
+            return [
+                'success' => false,
+                'message' => 'El usuario ya está inscrito en este evento',
+                'code' => 409
+            ];
         }
 
-        // 3. Verificar si ya está inscrito
-        if ($this->eventRepository->isUserRegistered($userId, $eventId)) {
-            return ['success' => false, 'message' => 'El usuario ya está inscrito', 'code' => 409];
-        }
+        // if ((int) $eventoDTO->availablePlaces <= 0) {
+        //     return [
+        //         'success' => false,
+        //         'message' => 'No quedan plazas disponibles',
+        //         'code' => 409
+        //     ];
+        // }
+        $inscripcionExitosa = $this->eventRepository->inscribirUsuario($userId, $eventId);
 
-        // 4. Intentar registro
-        if ($this->eventRepository->registerUser($userId, $eventId)) {
-            return ['success' => true, 'message' => 'Inscripción realizada con éxito', 'code' => 201];
+        if ($inscripcionExitosa) {
+            return [
+                'success' => true,
+                'message' => 'Inscripción realizada con éxito',
+                'code' => 201
+            ];
+        } else {
+            // Si el repo devuelve false, es que falló la transacción (ej: error SQL raro)
+            return [
+                'success' => false,
+                'message' => 'Error interno al procesar la inscripción',
+                'code' => 500
+            ];
         }
-
-        return ['success' => false, 'message' => 'Error al realizar la inscripción', 'code' => 500];
     }
 
-    public function cancelSignupUser(int $userId, int $eventId): array
+    public function cancelarInscripcionUsuario(int $userId, int $eventId): array
     {
-        // 1. Verificar si está inscrito
-        if (!$this->eventRepository->isUserRegistered($userId, $eventId)) {
-            return ['success' => false, 'message' => 'El usuario no está inscrito en este evento', 'code' => 404];
+        // 1. PASO: ¿El usuario está inscrito?
+        // No podemos borrar lo que no existe.
+        $estaInscrito = $this->eventRepository->verificarUsuarioRegistrado($userId, $eventId);
+
+        if (!$estaInscrito) {
+            return [
+                'success' => false,
+                'message' => 'El usuario no está inscrito en este evento',
+                'code' => 404 // No encontrado
+            ];
         }
 
-        // 2. Intentar borrar registro
-        if ($this->eventRepository->unregisterUser($userId, $eventId)) {
-            return ['success' => true, 'message' => 'Inscripción cancelada', 'code' => 200];
-        }
+        // 2. PASO: Intentar borrar (Borrar + Sumar plaza)
+        $cancelacionExitosa = $this->eventRepository->cancelarInscripcion($userId, $eventId);
 
-        return ['success' => false, 'message' => 'Error al cancelar la inscripción', 'code' => 500];
+        if ($cancelacionExitosa) {
+            return [
+                'success' => true,
+                'message' => 'Inscripción cancelada correctamente',
+                'code' => 200
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Error al cancelar la inscripción',
+                'code' => 500
+            ];
+        }
     }
+
 }
 ?>
