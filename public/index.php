@@ -17,7 +17,7 @@ use App\Enum\Role;
 use App\Enum\Type;
 
 // 1. Configuración de cabeceras (CORS y JSON)
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: *"); //http://localhost:5173
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
@@ -72,6 +72,8 @@ try {
     $router->add('GET',    '/api/events/{id}',               [$eventController, 'getEventById']);
     $router->add('GET',    '/api/events/title/{title}',      [$eventController, 'getEventsByName']);
     $router->add('POST',   '/api/events',                    [$eventController, 'createEvent'], ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('POST',   '/api/events/{id}/signup',        [$eventController, 'signup'], ['auth' => true]);
+    $router->add('DELETE',   '/api/events/{id}/signup',      [$eventController, 'cancelSignup'], ['auth' => true]);
 
     ///////////////////////////////////////////////////////////////////////
 

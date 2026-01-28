@@ -77,83 +77,52 @@ class EventService
     }
 
 
-
+    /**
+     * Inscribe un usuario en un evento
+     * @param int $userId
+     * @param int $eventId
+     * @return array{code: int, message: string, success: bool}
+     */
     public function inscribirUsuario(int $userId, int $eventId): array
     {
-        $eventoDTO = $this->getEventById($eventId);
-        if (!$eventoDTO) {
-            return [
-                'success' => false,
-                'message' => 'El evento no existe',
-                'code' => 404
-            ];
+        $eventoModelo = $this->eventRepository->getEventById($eventId);
+
+        if (!$eventoModelo) {
+            return ['success' => false, 'message' => 'El evento no existe', 'code' => 404];
         }
 
-        $estaInscrito = $this->eventRepository->verificarUsuarioRegistrado($userId, $eventId);
-        if ($estaInscrito) {
-            return [
-                'success' => false,
-                'message' => 'El usuario ya está inscrito en este evento',
-                'code' => 409
-            ];
+        if ($this->eventRepository->verificarUsuarioRegistrado($userId, $eventId)) {
+            return ['success' => false, 'message' => 'Ya estás inscrito', 'code' => 409];
+        }
+        // Validar plazas
+        if ((int) $eventoModelo->getAvailablePlaces() <= 0) {
+            return ['success' => false, 'message' => 'No quedan plazas libres', 'code' => 409];
+        }
+        //Inscribir
+        if ($this->eventRepository->inscribirUsuario($userId, $eventId)) {
+            return ['success' => true, 'message' => 'Inscrito correctamente', 'code' => 201];
         }
 
-        // if ((int) $eventoDTO->availablePlaces <= 0) {
-        //     return [
-        //         'success' => false,
-        //         'message' => 'No quedan plazas disponibles',
-        //         'code' => 409
-        //     ];
-        // }
-        $inscripcionExitosa = $this->eventRepository->inscribirUsuario($userId, $eventId);
-
-        if ($inscripcionExitosa) {
-            return [
-                'success' => true,
-                'message' => 'Inscripción realizada con éxito',
-                'code' => 201
-            ];
-        } else {
-            // Si el repo devuelve false, es que falló la transacción (ej: error SQL raro)
-            return [
-                'success' => false,
-                'message' => 'Error interno al procesar la inscripción',
-                'code' => 500
-            ];
-        }
+        return ['success' => false, 'message' => 'Error interno', 'code' => 500];
     }
 
+    /**
+     * Cancela la inscripción de un usuario en un evento
+     * @param int $userId
+     * @param int $eventId
+     * @return array{code: int, message: string, success: bool}
+     */ 
     public function cancelarInscripcionUsuario(int $userId, int $eventId): array
     {
-        // 1. PASO: ¿El usuario está inscrito?
-        // No podemos borrar lo que no existe.
-        $estaInscrito = $this->eventRepository->verificarUsuarioRegistrado($userId, $eventId);
-
-        if (!$estaInscrito) {
-            return [
-                'success' => false,
-                'message' => 'El usuario no está inscrito en este evento',
-                'code' => 404 // No encontrado
-            ];
+        if (!$this->eventRepository->verificarUsuarioRegistrado($userId, $eventId)) {
+            return ['success' => false, 'message' => 'No estás inscrito', 'code' => 404];
         }
 
-        // 2. PASO: Intentar borrar (Borrar + Sumar plaza)
-        $cancelacionExitosa = $this->eventRepository->cancelarInscripcion($userId, $eventId);
-
-        if ($cancelacionExitosa) {
-            return [
-                'success' => true,
-                'message' => 'Inscripción cancelada correctamente',
-                'code' => 200
-            ];
-        } else {
-            return [
-                'success' => false,
-                'message' => 'Error al cancelar la inscripción',
-                'code' => 500
-            ];
+        if ($this->eventRepository->cancelarInscripcion($userId, $eventId)) {
+            return ['success' => true, 'message' => 'Cancelado correctamente', 'code' => 200];
         }
+
+        return ['success' => false, 'message' => 'Error al cancelar', 'code' => 500];
     }
-
 }
 ?>
