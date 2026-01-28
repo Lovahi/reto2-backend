@@ -108,5 +108,62 @@ class EventRepository {
         }
         return $result;
     }
+
+    //////////////NUEVO////////////////////
+    public function isUserRegistered(int $userId, int $eventId): bool {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM event_registrations WHERE user_id = :user_id AND event_id = :event_id");
+        $stmt->execute(['user_id' => $userId, 'event_id' => $eventId]);
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function registerUser(int $userId, int $eventId): bool {
+        // Usamos transacciones para asegurar que se resta la plaza Y se inscribe al usuario
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Insertar inscripción
+            $stmt = $this->db->prepare("INSERT INTO event_registrations (user_id, event_id) VALUES (:user_id, :event_id)");
+            $stmt->execute(['user_id' => $userId, 'event_id' => $eventId]);
+
+            // 2. Restar una plaza
+            $stmtUpdate = $this->db->prepare("UPDATE events SET plazasLibres = plazasLibres - 1 WHERE id = :id AND plazasLibres > 0");
+            $stmtUpdate->execute(['id' => $eventId]);
+            
+            // Verificar si se actualizó la fila (si no, es que no había plazas)
+            if ($stmtUpdate->rowCount() === 0) {
+                 throw new \Exception("No quedan plazas disponibles");
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
+
+    public function unregisterUser(int $userId, int $eventId): bool {
+        try {
+            $this->db->beginTransaction();
+
+            // 1. Borrar inscripción
+            $stmt = $this->db->prepare("DELETE FROM event_registrations WHERE user_id = :user_id AND event_id = :event_id");
+            $stmt->execute(['user_id' => $userId, 'event_id' => $eventId]);
+
+            if ($stmt->rowCount() === 0) {
+                 throw new \Exception("Usuario no estaba inscrito");
+            }
+
+            // 2. Sumar una plaza
+            $stmtUpdate = $this->db->prepare("UPDATE events SET plazasLibres = plazasLibres + 1 WHERE id = :id");
+            $stmtUpdate->execute(['id' => $eventId]);
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            return false;
+        }
+    }
 }
 ?>
