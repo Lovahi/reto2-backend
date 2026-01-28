@@ -13,24 +13,6 @@ class GameRepository
     {
         $this->db = $db;
     }
-
-    public function getAllGames(): array{
-        $stmt = $this->db->query("SELECT * FROM games");
-        $games = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $platforms = json_decode($row['plataformas'], true) ?: [];
-            
-            $games[] = new Game(
-                (int)$row['id'], 
-                $row['titulo'], 
-                $row['genero'], 
-                $platforms, 
-                $row['imagen'], 
-                $row['descripcion']
-            );
-        }
-        return $games;
-    }
     
     public function getGameById(int $id): ?Game{
         $stmt = $this->db->prepare("SELECT * FROM games WHERE id = :id");

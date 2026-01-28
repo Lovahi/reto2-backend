@@ -17,7 +17,6 @@ use App\Repository\EventRepository;
 use App\Repository\GameRepository;
 
 use App\Enum\Role;
-use App\Enum\Type;
 
 // 1. Configuración de cabeceras (CORS y JSON)
 header("Access-Control-Allow-Origin: *");
@@ -82,7 +81,7 @@ try {
     $router->add('POST',   '/api/events',                    [$eventController, 'createEvent'], ['auth' => true, 'role' => Role::ADMIN]);
 
     // Game API Routes
-    $router->add('GET',    '/api/games',              [$gameController, 'getAllGames']);
+    $router->add('GET',    '/api/games',              [$gameController, 'getGames']);
     $router->add('GET',    '/api/games/{id}',         [$gameController, 'getGamesById']);
     $router->add('GET',    '/api/games/name/{name}',  [$gameController, 'getGamesByName']);
     

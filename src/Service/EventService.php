@@ -6,6 +6,7 @@ use App\Repository\EventRepository;
 use App\Model\Event;
 use App\DTO\EventDTO;
 use App\Enum\Type;
+use App\Core\ImageHelper;
 
 class EventService {
     private EventRepository $eventRepository;
@@ -18,7 +19,16 @@ class EventService {
         $event = $this->eventRepository->getEventById($id);
         if (!$event) return null;
 
-        return new EventDTO($event->getId(), $event->getTitle(), $event->getType(), $event->getDate(), $event->getHour(), $event->getAvailablePlaces(), $event->getImage(), $event->getDescription());
+        return new EventDTO(
+            $event->getId(),
+            $event->getTitle(),
+            $event->getType(),
+            $event->getDate(),
+            $event->getHour(),
+            $event->getAvailablePlaces(),
+            ImageHelper::getImageUrl($event->getImage(), 'events'),
+            $event->getDescription()
+        );
     }
 
     public function getEventsPaginated(int $page): array {
@@ -30,12 +40,11 @@ class EventService {
             $event->getDate(),
             $event->getHour(),
             $event->getAvailablePlaces(),
-            $event->getImage(),
+            ImageHelper::getImageUrl($event->getImage(), 'events'),
             $event->getDescription()
         ), $events);
     }
 
-    
     public function getEventsByName(string $title): array {
         $events = $this->eventRepository->getEventsByTitle($title);
         return array_map(fn($event) => new EventDTO(
@@ -45,7 +54,7 @@ class EventService {
             $event->getDate(),
             $event->getHour(),
             $event->getAvailablePlaces(),
-            $event->getImage(),
+            ImageHelper::getImageUrl($event->getImage(), 'events'),
             $event->getDescription()
         ), $events);
     }
@@ -55,6 +64,9 @@ class EventService {
             throw new \Exception("Missing required fields: title, type, date, hour, availablePlaces, image, description");
         }
 
+        $image = $data['image'];
+        $imagePath = ImageHelper::saveImage($image, 'events');
+
         $event = new Event(
             null,
             $data['title'],
@@ -62,7 +74,7 @@ class EventService {
             $data['date'],
             $data['hour'],
             $data['availablePlaces'],
-            $data['image'],
+            $imagePath,
             $data['description']
         );
 

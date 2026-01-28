@@ -16,8 +16,6 @@ class UserController {
         $this->userService = $userService;
     }
 
-
-
     public function getAllUsers(): void {
         $users = $this->userService->getAllUsers();
         $this->jsonResponse(array_map(fn($u) => $u->toArray(), $users));
@@ -34,9 +32,9 @@ class UserController {
     }
 
     public function createUser(): void {
-        $data = $this->getJsonInput();
+        $data = $this->getRequestInput();
         
-        if (!$data || !\is_array($data)) {
+        if (empty($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }
@@ -55,9 +53,9 @@ class UserController {
     }
 
     public function updateUser(int $id): void {
-        $data = $this->getJsonInput();
+        $data = $this->getRequestInput();
         
-        if (!$data || !\is_array($data)) {
+        if (empty($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }

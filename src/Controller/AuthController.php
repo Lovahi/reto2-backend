@@ -16,12 +16,10 @@ class AuthController {
         $this->authService = $authService;
     }
 
-
-
     public function register(): void {
-        $data = $this->getJsonInput();
+        $data = $this->getRequestInput();
 
-        if (!$data || !\is_array($data)) {
+        if (empty($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }
@@ -40,7 +38,7 @@ class AuthController {
     }
 
     public function login(): void {
-        $data = $this->getJsonInput();
+        $data = $this->getRequestInput();
 
         if (!$data || empty($data['email']) || empty($data['password'])) {
             $this->jsonResponse(['error' => 'Email and password are required'], 400);

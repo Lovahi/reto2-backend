@@ -48,9 +48,9 @@ class EventController {
     }
 
     public function createEvent(): void {
-        $data = $this->getJsonInput();
+        $data = $this->getRequestInput();
         
-        if (!$data || !\is_array($data)) {
+        if (empty($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }
@@ -66,5 +66,7 @@ class EventController {
         } catch (Exception $e) {
             $this->jsonResponse(['error' => $e->getMessage()], 400);
         }
+
     }
+
 }

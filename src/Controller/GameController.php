@@ -11,19 +11,22 @@ class GameController {
     use ApiResponseTrait;
     private GameService $gameService;
 
-    public function __construct(GameService $GameService)
-    {
+    public function __construct(GameService $GameService) {
         $this->gameService = $GameService;
     }
 
-    public function getAllGames(): void
-    {
-        $games = $this->gameService->getAllGames();
-        $this->jsonResponse(array_map(fn($u) => $u->toArray(), $games));
+    public function getGames(): void {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $games = $this->gameService->getGamesPaginated($page);
+
+        if (!empty($games)) {
+            $this->jsonResponse(array_map(fn($g) => $g->toArray(), $games));
+        } else {
+            $this->jsonResponse(['error' => 'No games found for this page'], 404);
+        }
     }
 
-    public function getGamesById(int $id): void
-    {
+    public function getGamesById(int $id): void {
         $game = $this->gameService->getGameById($id);
 
         if ($game) {
@@ -33,8 +36,7 @@ class GameController {
         }
     }
 
-    public function getGamesByName(string $name): void
-    {
+    public function getGamesByName(string $name): void {
         $games = $this->gameService->getGamesByName($name);
 
         if ($games) {
