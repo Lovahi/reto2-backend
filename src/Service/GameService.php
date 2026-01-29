@@ -26,8 +26,8 @@ class GameService {
         );
     }
 
-    public function getAllGames(): array {
-        $games = $this->GameRepository->getAllGames();
+    public function getGamesByFilter(array $filters, int $page = 1): array {
+        $games = $this->GameRepository->getGamesByFilter($filters, $page);
         return array_map(fn($game) => new GameDTO(
             $game->getId(),
             $game->getTitle(),
@@ -38,16 +38,8 @@ class GameService {
         ), $games);
     }
 
-    public function getGamesByName(string $name): array {
-        $games = $this->GameRepository->getGamesByName($name);
-        return array_map(fn($game) => new GameDTO(
-            $game->getId(),
-            $game->getTitle(),
-            $game->getGenre(),
-            $game->getPlatforms(),
-            $game->getImage(),
-            $game->getDescription()
-        ), $games);
+    public function getGamesPagesCounter(): int
+    {
+        return $this->GameRepository->getGamesPagesCounter();
     }
-
 }

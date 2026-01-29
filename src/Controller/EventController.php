@@ -27,24 +27,17 @@ class EventController {
     }
 
     public function getEvents(): void {
-        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-        $events = $this->eventService->getEventsPaginated($page);
-
-        if (!empty($events)) {
-            $this->jsonResponse(array_map(fn($e) => $e->toArray(), $events));
-        } else {
-            $this->jsonResponse(['error' => 'No events found for this page'], 404);
-        }
+        $filters = $_GET;
+        $page = isset($filters['page']) ? (int) $filters['page'] : 1;
+        unset($filters['page']);
+        
+        $events = $this->eventService->getEventsByFilter($filters, $page);
+        $this->jsonResponse(array_map(fn($e) => $e->toArray(), $events));
     }
 
-    public function getEventsByName(string $title): void {
-        $events = $this->eventService->getEventsByName($title);
-
-        if ($events) {
-            $this->jsonResponse(array_map(fn($e) => $e->toArray(), $events));
-        } else {
-            $this->jsonResponse(['error' => 'No events found with that name'], 404);
-        }
+    public function getEventsPagesCounter(): void {
+        $counter = $this->eventService->getEventsPagesCounter();
+        $this->jsonResponse(['total' => $counter]);
     }
 
     public function createEvent(): void {

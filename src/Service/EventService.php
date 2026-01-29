@@ -22,8 +22,8 @@ class EventService {
         return new EventDTO($event->getId(), $event->getTitle(), $event->getType(), $event->getDate(), $event->getHour(), $event->getAvailablePlaces(), $event->getImage(), $event->getDescription());
     }
 
-    public function getEventsPaginated(int $page): array {
-        $events = $this->eventRepository->getEventsPaginated($page);
+    public function getEventsByFilter(array $filters, int $page = 1): array {
+        $events = $this->eventRepository->getEventsByFilter($filters, $page);
         return array_map(fn($event) => new EventDTO(
             $event->getId(),
             $event->getTitle(),
@@ -36,19 +36,8 @@ class EventService {
         ), $events);
     }
 
-
-    public function getEventsByName(string $title): array {
-        $events = $this->eventRepository->getEventsByTitle($title);
-        return array_map(fn($event) => new EventDTO(
-            $event->getId(),
-            $event->getTitle(),
-            $event->getType(),
-            $event->getDate(),
-            $event->getHour(),
-            $event->getAvailablePlaces(),
-            $event->getImage(),
-            $event->getDescription()
-        ), $events);
+    public function getEventsPagesCounter(): int {
+        return $this->eventRepository->getEventsPagesCounter();
     }
 
     public function createEvent(array $data): bool {

@@ -86,8 +86,8 @@ try {
     
     // Event API Routes
     $router->add('GET',    '/api/events',                  [$eventController, 'getEvents']);
+    $router->add('GET',    '/api/events/pages',            [$eventController, 'getEventsPagesCounter']);
     $router->add('GET',    '/api/events/{id}',             [$eventController, 'getEventById']);
-    $router->add('GET',    '/api/events/title/{title}',    [$eventController, 'getEventsByName']);
     $router->add('GET',    '/api/events/{id}/users',       [$userEventController, 'getEventsUsers'],      ['auth' => true]);
     $router->add('POST',   '/api/events',                  [$eventController, 'createEvent'],             ['auth' => true, 'role' => Role::ADMIN]);
     
@@ -95,10 +95,10 @@ try {
     $router->add('DELETE', '/api/events/{id}/signup',      [$userEventController, 'cancelSignup'],        ['auth' => true]);
 
     // Game API Routes
-    $router->add('GET',    '/api/games',                   [$gameController, 'getAllGames']);
+    $router->add('GET',    '/api/games',                   [$gameController, 'getGames']);
+    $router->add('GET',    '/api/games/pages',             [$gameController, 'getGamesPagesCounter']);
     $router->add('GET',    '/api/games/{id}',              [$gameController, 'getGamesById']);
-    $router->add('GET',    '/api/games/name/{name}',       [$gameController, 'getGamesByName']);
-    
+
     // 5. Ejecución
     $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 } catch (Exception $e) {

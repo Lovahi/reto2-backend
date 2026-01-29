@@ -9,85 +9,78 @@ class GameRepository
 {
     private PDO $db;
 
-    public function __construct(PDO $db)
-    {
+    public function __construct(PDO $db) {
         $this->db = $db;
     }
 
-    public function getAllGames(): array{
-        $stmt = $this->db->query("SELECT * FROM games");
-        $games = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $platforms = json_decode($row['plataformas'], true) ?: [];
-            
-            $games[] = new Game(
-                (int)$row['id'], 
-                $row['titulo'], 
-                $row['genero'], 
-                $platforms, 
-                $row['imagen'], 
-                $row['descripcion']
-            );
-        }
-        return $games;
-    }
-    
-    public function getGameById(int $id): ?Game{
+    public function getGameById(int $id): ?Game {
         $stmt = $this->db->prepare("SELECT * FROM games WHERE id = :id");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$row) return null;
         $platforms = json_decode($row['plataformas'], true) ?: [];
-        
+
         return new Game(
-            (int)$row['id'], 
-            $row['titulo'], 
-            $row['genero'], 
-            $platforms, 
-            $row['imagen'], 
+            (int)$row['id'],
+            $row['titulo'],
+            $row['genero'],
+            $platforms,
+            $row['imagen'],
             $row['descripcion']
         );
     }
-    
-    public function getGamesPaginated(int $page, int $limit = 9): array {
+
+    public function getGamesByFilter(array $filters, int $page = 1, int $limit = 9): array {
+        $sql = "SELECT * FROM games WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['titulo'])) {
+            $sql .= " AND titulo LIKE :titulo";
+            $params['titulo'] = '%' . $filters['titulo'] . '%';
+        }
+
+        if (!empty($filters['genero'])) {
+            $sql .= " AND genero = :genero";
+            $params['genero'] = $filters['genero'];
+        }
+
+        if (!empty($filters['plataforma'])) {
+            $sql .= " AND plataformas LIKE :plataforma";
+            $params['plataforma'] = '%' . $filters['plataforma'] . '%';
+        }
+
+        $page = max(1, $page);
         $offset = ($page - 1) * $limit;
-        $stmt = $this->db->prepare("SELECT * FROM games LIMIT :limit OFFSET :offset");
+        $sql .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->prepare($sql);
+        
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
         $stmt->execute();
 
         $games = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $platforms = json_decode($row['plataformas'], true) ?: [];
             $games[] = new Game(
-                (int)$row['id'], 
-                $row['titulo'], 
-                $row['genero'], 
-                $platforms, 
-                $row['imagen'], 
+                (int)$row['id'],
+                $row['titulo'],
+                $row['genero'],
+                json_decode($row['plataformas'], true) ?: [],
+                $row['imagen'],
                 $row['descripcion']
             );
         }
         return $games;
     }
-    
-    public function getGamesByName(string $name): array{
-        $stmt = $this->db->prepare("SELECT * FROM games WHERE titulo LIKE :name");
-        $stmt->execute(['name' => '%' . $name . '%']);
-        
-        $games = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $platforms = json_decode($row['plataformas'], true) ?: [];
-            $games[] = new Game(
-                (int)$row['id'], 
-                $row['titulo'], 
-                $row['genero'], 
-                $platforms, 
-                $row['imagen'], 
-                $row['descripcion']
-            );
-        }
-        return $games;
+
+    public function getGamesPagesCounter(): int {
+        $stmt = $this->db->query("SELECT COUNT(*) FROM games");
+        $counter = (int) $stmt->fetchColumn();
+        return $counter;
     }
 }

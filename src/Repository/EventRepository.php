@@ -34,11 +34,37 @@ class EventRepository
         );
     }
 
-    public function getEventsPaginated(int $page, int $limit = 9): array {
+    public function getEventsByFilter(array $filters, int $page = 1, int $limit = 9): array {
+        $sql = "SELECT * FROM events WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['titulo'])) {
+            $sql .= " AND titulo LIKE :titulo";
+            $params['titulo'] = '%' . $filters['titulo'] . '%';
+        }
+
+        if (!empty($filters['tipo'])) {
+            $sql .= " AND tipo = :tipo";
+            $params['tipo'] = $filters['tipo'];
+        }
+
+        if (!empty($filters['fecha'])) {
+            $sql .= " AND fecha = :fecha";
+            $params['fecha'] = $filters['fecha'];
+        }
+
+        $page = max(1, $page);
         $offset = ($page - 1) * $limit;
-        $stmt = $this->db->prepare("SELECT * FROM events LIMIT :limit OFFSET :offset");
+        $sql .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->prepare($sql);
+        
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        
         $stmt->execute();
 
         $events = [];
@@ -57,23 +83,9 @@ class EventRepository
         return $events;
     }
 
-    public function getEventsByTitle(string $title): array {
-        $stmt = $this->db->prepare("SELECT * FROM events WHERE titulo LIKE :title");
-        $stmt->execute(['title' => '%' . $title . '%']);
-        $events = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $events[] = new Event(
-                (int) $row['id'],
-                $row['titulo'],
-                Type::from($row['tipo']),
-                $row['fecha'],
-                $row['hora'],
-                (int) $row['plazasLibres'],
-                $row['imagen'],
-                $row['descripcion']
-            );
-        }
-        return $events;
+    public function getEventsPagesCounter(): int {
+        $stmt = $this->db->query("SELECT COUNT(*) FROM events");
+        return (int) $stmt->fetchColumn();
     }
 
     public function createEvent(Event $event): bool {

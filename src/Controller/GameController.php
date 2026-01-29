@@ -16,8 +16,12 @@ class GameController {
         $this->gameService = $GameService;
     }
 
-    public function getAllGames(): void {
-        $games = $this->gameService->getAllGames();
+    public function getGames(): void {
+        $filters = $_GET;
+        $page = isset($filters['page']) ? (int) $filters['page'] : 1;
+        unset($filters['page']);
+        
+        $games = $this->gameService->getGamesByFilter($filters, $page);
         $this->jsonResponse(array_map(fn($u) => $u->toArray(), $games));
     }
 
@@ -30,14 +34,10 @@ class GameController {
             $this->jsonResponse(['error' => 'Game not found'], 404);
         }
     }
-
-    public function getGamesByName(string $name): void {
-        $games = $this->gameService->getGamesByName($name);
-
-        if ($games) {
-            $this->jsonResponse(array_map(fn($g) => $g->toArray(), $games));
-        } else {
-            $this->jsonResponse(['error' => 'No games found with that name'], 404);
-        }
+    
+    public function getGamesPagesCounter(): void {
+        $counter = $this->gameService->getGamesPagesCounter();
+        $this->jsonResponse(['total' => $counter]);
     }
+
 }
