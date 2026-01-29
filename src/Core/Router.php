@@ -21,7 +21,7 @@ class Router {
         $uri = \explode('?', $uri)[0];
 
         foreach ($this->routes as $route) {
-            $pattern = \preg_replace('/\{(\w+)\}/', '(\d+)', $route['path']);
+            $pattern = \preg_replace('/\{(\w+)\}/', '([^/]+)', $route['path']);
             $pattern = "#^" . $pattern . "$#";
 
             if ($route['method'] === $method && \preg_match($pattern, $uri, $matches)) {

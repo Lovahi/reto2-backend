@@ -67,4 +67,17 @@ class GameController
             $this->jsonResponse(['error' => 'No games found with that name'], 404);
         }
     }
+    public function getGamesCounter(): void // Cambiamos a void porque imprimimos el JSON
+    {
+        $counter = $this->gameService->getGamesCounter();
+        header('Content-Type: application/json');
+        echo json_encode(['total' => $counter]);
+        exit;
+    }
+
+    public function getGamesPaginated(int $page = 1): void
+    {
+        $games = $this->gameService->getGamesPaginated($page);
+        $this->jsonResponse(array_map(fn($u) => $u->toArray(), $games));
+    }
 }

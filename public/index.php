@@ -72,6 +72,8 @@ try {
     $router->add('GET',    '/api/games',         [$gameController, 'getAllGames']);
     $router->add('GET',    '/api/games/{id}',    [$gameController, 'getGamesById']);
     $router->add('GET',    '/api/games/name/{name}',  [$gameController, 'getGamesByName']);
+    $router->add('GET',    '/api/games/counter/total',  [$gameController, 'getGamesCounter']);
+    $router->add('GET',    '/api/games/page/{page}',  [$gameController, 'getGamesPaginated']);
 
     ///////////////////////////////////////////////////////////////////////
 

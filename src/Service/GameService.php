@@ -42,4 +42,15 @@ class GameService
         ), $games);
     }
 
+    public function getGamesCounter(): int
+    {
+        $counter = $this->GameRepository->getGamesCounter();
+        return $counter;
+    }
+
+    public function getGamesPaginated(int $page = 1): array
+    {
+        $games = $this->GameRepository->getGamesPaginated($page);
+        return $games;
+    }
 }
