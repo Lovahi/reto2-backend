@@ -4,18 +4,19 @@ namespace App\Core;
 
 class ImageHelper {
     /**
-     * Construye la URL completa para una imagen.
      * @param string|null $imageName Nombre del archivo en la BBDD.
      * @param string $subFolder Carpeta dentro de /public/img/.
-     * @return string URL absoluta.
      */
     public static function getImageUrl(?string $imageName, string $subFolder): string {
         if (!$imageName) return "";
+        
+        $filePath = __DIR__ . "/../../public/img/{$subFolder}/{$imageName}";
+        
+        if (!file_exists($filePath)) {
+            return "";
+        }
 
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-        return "{$protocol}{$host}/img/{$subFolder}/{$imageName}";
+        return $imageName;
     }
 
     public static function saveImage($image, $subFolder): string {
@@ -31,8 +32,9 @@ class ImageHelper {
             return $image;
         }
         
+        $baseName = pathinfo($image['name'], PATHINFO_FILENAME);
         $extension = pathinfo($image['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('img_') . "." . $extension;
+        $filename = str_replace(' ', '-', $baseName) . "." . $extension;
         
         if (move_uploaded_file($image['tmp_name'], "{$targetDir}{$filename}")) {
             return $filename;
