@@ -6,7 +6,8 @@ use App\Model\Event;
 use App\Enum\Type;
 use PDO;
 
-class EventRepository {
+class EventRepository
+{
     private PDO $db;
 
     public function __construct(PDO $db) {
@@ -18,16 +19,17 @@ class EventRepository {
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) return null;
+        if (!$row)
+            return null;
 
         return new Event(
-            (int)$row['id'], 
-            $row['titulo'], 
-            Type::from($row['tipo']), 
-            $row['fecha'], 
-            $row['hora'], 
-            (int)$row['plazasLibres'], 
-            $row['imagen'], 
+            (int) $row['id'],
+            $row['titulo'],
+            Type::from($row['tipo']),
+            $row['fecha'],
+            $row['hora'],
+            (int) $row['plazasLibres'],
+            $row['imagen'],
             $row['descripcion']
         );
     }
@@ -42,13 +44,13 @@ class EventRepository {
         $events = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $events[] = new Event(
-                (int)$row['id'], 
-                $row['titulo'], 
-                Type::from($row['tipo']), 
-                $row['fecha'], 
-                $row['hora'], 
-                (int)$row['plazasLibres'], 
-                $row['imagen'], 
+                (int) $row['id'],
+                $row['titulo'],
+                Type::from($row['tipo']),
+                $row['fecha'],
+                $row['hora'],
+                (int) $row['plazasLibres'],
+                $row['imagen'],
                 $row['descripcion']
             );
         }
@@ -61,13 +63,13 @@ class EventRepository {
         $events = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $events[] = new Event(
-                (int)$row['id'], 
-                $row['titulo'], 
-                Type::from($row['tipo']), 
-                $row['fecha'], 
-                $row['hora'], 
-                (int)$row['plazasLibres'], 
-                $row['imagen'], 
+                (int) $row['id'],
+                $row['titulo'],
+                Type::from($row['tipo']),
+                $row['fecha'],
+                $row['hora'],
+                (int) $row['plazasLibres'],
+                $row['imagen'],
                 $row['descripcion']
             );
         }
@@ -86,7 +88,7 @@ class EventRepository {
             'descripcion' => $event->getDescription(),
         ]);
         if ($result) {
-            $event->setId((int)$this->db->lastInsertId());
+            $event->setId((int) $this->db->lastInsertId());
         }
         return $result;
     }

@@ -16,7 +16,8 @@ class EventService {
 
     public function getEventById(int $id): ?EventDTO {
         $event = $this->eventRepository->getEventById($id);
-        if (!$event) return null;
+        if (!$event)
+            return null;
 
         return new EventDTO($event->getId(), $event->getTitle(), $event->getType(), $event->getDate(), $event->getHour(), $event->getAvailablePlaces(), $event->getImage(), $event->getDescription());
     }
@@ -35,7 +36,7 @@ class EventService {
         ), $events);
     }
 
-    
+
     public function getEventsByName(string $title): array {
         $events = $this->eventRepository->getEventsByTitle($title);
         return array_map(fn($event) => new EventDTO(

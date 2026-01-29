@@ -9,21 +9,19 @@ use App\Core\ApiResponseTrait;
 
 class GameController {
     use ApiResponseTrait;
+
     private GameService $gameService;
 
-    public function __construct(GameService $GameService)
-    {
+    public function __construct(GameService $GameService) {
         $this->gameService = $GameService;
     }
 
-    public function getAllGames(): void
-    {
+    public function getAllGames(): void {
         $games = $this->gameService->getAllGames();
         $this->jsonResponse(array_map(fn($u) => $u->toArray(), $games));
     }
 
-    public function getGamesById(int $id): void
-    {
+    public function getGamesById(int $id): void {
         $game = $this->gameService->getGameById($id);
 
         if ($game) {
@@ -33,8 +31,7 @@ class GameController {
         }
     }
 
-    public function getGamesByName(string $name): void
-    {
+    public function getGamesByName(string $name): void {
         $games = $this->gameService->getGamesByName($name);
 
         if ($games) {

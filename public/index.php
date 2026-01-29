@@ -4,23 +4,26 @@ session_start();
 
 use App\Core\Router;
 use App\Core\Database;
-use App\Controller\EventController;
 use App\Controller\UserController;
 use App\Controller\AuthController;
-use App\Service\EventService;
+use App\Controller\EventController;
+use App\Controller\UserEventController;
 use App\Controller\GameController;
 use App\Service\UserService;
 use App\Service\AuthService;
+use App\Service\EventService;
+use App\Service\UserEventService;
 use App\Service\GameService;
 use App\Repository\UserRepository;
 use App\Repository\EventRepository;
+use App\Repository\UserEventRepository;
 use App\Repository\GameRepository;
 
 use App\Enum\Role;
 use App\Enum\Type;
 
 // 1. Configuración de cabeceras (CORS y JSON)
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: *"); //http://localhost:5173
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
@@ -56,6 +59,10 @@ try {
     $eventService = new EventService($eventRepository);
     $eventController = new EventController($eventService);
 
+    $userEventRepository = new UserEventRepository($db);
+    $userEventService = new UserEventService($userEventRepository, $userService);
+    $userEventController = new UserEventController($userEventService);
+
     $gameRepository = new GameRepository($db);
     $gameService = new GameService($gameRepository);
     $gameController = new GameController($gameService);
@@ -64,29 +71,33 @@ try {
     $router = new Router();
 
     // User API Routes
-    $router->add('GET',    '/api/users',       [$userController, 'getAllUsers']);
-    $router->add('GET',    '/api/users/{id}',  [$userController, 'getUserById'], ['auth' => true]);
-    $router->add('POST',   '/api/users',       [$userController, 'createUser'],  ['auth' => true, 'role' => Role::ADMIN]);
-    $router->add('PUT',    '/api/users/{id}',  [$userController, 'updateUser'],  ['auth' => true, 'role' => Role::ADMIN]);
-    $router->add('DELETE', '/api/users/{id}',  [$userController, 'deleteUser'],  ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('GET',    '/api/users',                   [$userController, 'getAllUsers']);
+    $router->add('GET',    '/api/users/{id}',              [$userController, 'getUserById'],              ['auth' => true]);
+    $router->add('POST',   '/api/users',                   [$userController, 'createUser'],               ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('PUT',    '/api/users/{id}',              [$userController, 'updateUser'],               ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('DELETE', '/api/users/{id}',              [$userController, 'deleteUser'],               ['auth' => true, 'role' => Role::ADMIN]);
+    
+    $router->add('GET',    '/api/users/{id}/events',       [$userEventController, 'getUserEvents'],       ['auth' => true]);
 
     // Auth API Routes
-    $router->add('POST',   '/api/auth/register', [$authController, 'register']);
-    $router->add('POST',   '/api/auth/login',    [$authController, 'login']);
-    $router->add('POST',   '/api/auth/logout',   [$authController, 'logout']);
+    $router->add('POST',   '/api/auth/register',           [$authController, 'register']);
+    $router->add('POST',   '/api/auth/login',              [$authController, 'login']);
+    $router->add('POST',   '/api/auth/logout',             [$authController, 'logout'],                   ['auth' => true]);
     
     // Event API Routes
-    $router->add('GET',    '/api/events',                    [$eventController, 'getEvents']);
-    $router->add('GET',    '/api/events/{id}',               [$eventController, 'getEventById']);
-    $router->add('GET',    '/api/events/title/{title}',      [$eventController, 'getEventsByName']);
-    $router->add('POST',   '/api/events',                    [$eventController, 'createEvent'], ['auth' => true, 'role' => Role::ADMIN]);
+    $router->add('GET',    '/api/events',                  [$eventController, 'getEvents']);
+    $router->add('GET',    '/api/events/{id}',             [$eventController, 'getEventById']);
+    $router->add('GET',    '/api/events/title/{title}',    [$eventController, 'getEventsByName']);
+    $router->add('GET',    '/api/events/{id}/users',       [$userEventController, 'getEventsUsers'],      ['auth' => true]);
+    $router->add('POST',   '/api/events',                  [$eventController, 'createEvent'],             ['auth' => true, 'role' => Role::ADMIN]);
+    
+    $router->add('POST',   '/api/events/{id}/signup',      [$userEventController, 'signUp'],              ['auth' => true]);
+    $router->add('DELETE', '/api/events/{id}/signup',      [$userEventController, 'cancelSignup'],        ['auth' => true]);
 
     // Game API Routes
-    $router->add('GET',    '/api/games',              [$gameController, 'getAllGames']);
-    $router->add('GET',    '/api/games/{id}',         [$gameController, 'getGamesById']);
-    $router->add('GET',    '/api/games/name/{name}',  [$gameController, 'getGamesByName']);
-    
-    // User-Events API Routes
+    $router->add('GET',    '/api/games',                   [$gameController, 'getAllGames']);
+    $router->add('GET',    '/api/games/{id}',              [$gameController, 'getGamesById']);
+    $router->add('GET',    '/api/games/name/{name}',       [$gameController, 'getGamesByName']);
     
     // 5. Ejecución
     $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

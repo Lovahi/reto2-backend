@@ -16,8 +16,6 @@ class UserController {
         $this->userService = $userService;
     }
 
-
-
     public function getAllUsers(): void {
         $users = $this->userService->getAllUsers();
         $this->jsonResponse(array_map(fn($u) => $u->toArray(), $users));

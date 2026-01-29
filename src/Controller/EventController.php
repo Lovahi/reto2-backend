@@ -27,7 +27,7 @@ class EventController {
     }
 
     public function getEvents(): void {
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $events = $this->eventService->getEventsPaginated($page);
 
         if (!empty($events)) {
@@ -49,7 +49,7 @@ class EventController {
 
     public function createEvent(): void {
         $data = $this->getJsonInput();
-        
+
         if (!$data || !\is_array($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
