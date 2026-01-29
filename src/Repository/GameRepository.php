@@ -84,9 +84,8 @@ class GameRepository
     }
     public function getGamesByName(string $name): array
     {
-        $stmt = $this->db->prepare("SELECT * FROM games WHERE titulo LIKE :name");
-        $stmt->execute(['name' => '%' . $name . '%']);
-
+        $stmt = $this->db->prepare("SELECT * FROM games WHERE titulo LIKE :name OR genero LIKE :genre OR descripcion LIKE :descript OR LOWER(plataformas) LIKE :platforms ");
+        $stmt->execute(['name' =>$name . '%', 'genre' =>$name . '%', 'descript' =>$name . '%', 'platforms' => '%' .$name . '%']);
         $games = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $platforms = json_decode($row['plataformas'], true) ?: [];
