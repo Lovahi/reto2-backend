@@ -83,8 +83,27 @@ class EventRepository
         return $events;
     }
 
-    public function getEventsPagesCounter(): int {
-        $stmt = $this->db->query("SELECT COUNT(*) FROM events");
+    public function getEventsPagesCounter(array $filters = []): int {
+        $sql = "SELECT COUNT(*) FROM events WHERE 1=1";
+        $params = [];
+
+        if (!empty($filters['titulo'])) {
+            $sql .= " AND titulo LIKE :titulo";
+            $params['titulo'] = '%' . $filters['titulo'] . '%';
+        }
+
+        if (!empty($filters['tipo'])) {
+            $sql .= " AND tipo = :tipo";
+            $params['tipo'] = $filters['tipo'];
+        }
+
+        if (!empty($filters['fecha'])) {
+            $sql .= " AND fecha = :fecha";
+            $params['fecha'] = $filters['fecha'];
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return (int) $stmt->fetchColumn();
     }
 
@@ -103,5 +122,15 @@ class EventRepository
             $event->setId((int) $this->db->lastInsertId());
         }
         return $result;
+    }
+    public function incrementAvailablePlaces(int $eventId): bool {
+        $stmt = $this->db->prepare("UPDATE events SET plazasLibres = plazasLibres + 1 WHERE id = :id");
+        return $stmt->execute(['id' => $eventId]);
+    }
+
+    public function decrementAvailablePlaces(int $eventId): bool {
+        $stmt = $this->db->prepare("UPDATE events SET plazasLibres = plazasLibres - 1 WHERE id = :id AND plazasLibres > 0");
+        $stmt->execute(['id' => $eventId]);
+        return $stmt->rowCount() > 0;
     }
 }

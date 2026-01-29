@@ -6,6 +6,7 @@ use App\Repository\EventRepository;
 use App\Model\Event;
 use App\DTO\EventDTO;
 use App\Enum\Type;
+use App\Core\ImageHelper;
 
 class EventService {
     private EventRepository $eventRepository;
@@ -19,7 +20,16 @@ class EventService {
         if (!$event)
             return null;
 
-        return new EventDTO($event->getId(), $event->getTitle(), $event->getType(), $event->getDate(), $event->getHour(), $event->getAvailablePlaces(), $event->getImage(), $event->getDescription());
+        return new EventDTO(
+            $event->getId(),
+            $event->getTitle(),
+            $event->getType(),
+            $event->getDate(),
+            $event->getHour(),
+            $event->getAvailablePlaces(),
+            ImageHelper::getImageUrl($event->getImage(), 'events'),
+            $event->getDescription()
+        );
     }
 
     public function getEventsByFilter(array $filters, int $page = 1): array {
@@ -31,13 +41,13 @@ class EventService {
             $event->getDate(),
             $event->getHour(),
             $event->getAvailablePlaces(),
-            $event->getImage(),
+            ImageHelper::getImageUrl($event->getImage(), 'events'),
             $event->getDescription()
         ), $events);
     }
 
-    public function getEventsPagesCounter(): int {
-        return $this->eventRepository->getEventsPagesCounter();
+    public function getEventsPagesCounter(array $filters = []): int {
+        return $this->eventRepository->getEventsPagesCounter($filters);
     }
 
     public function createEvent(array $data): bool {
@@ -52,10 +62,17 @@ class EventService {
             $data['date'],
             $data['hour'],
             $data['availablePlaces'],
-            $data['image'],
+            ImageHelper::saveImage($data['image'], 'events'),
             $data['description']
         );
 
         return $this->eventRepository->createEvent($event);
+    }
+    public function incrementAvailablePlaces(int $eventId): bool {
+        return $this->eventRepository->incrementAvailablePlaces($eventId);
+    }
+
+    public function decrementAvailablePlaces(int $eventId): bool {
+        return $this->eventRepository->decrementAvailablePlaces($eventId);
     }
 }

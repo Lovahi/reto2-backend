@@ -1,0 +1,22 @@
+# Images folder
+public/img/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencies and build outputs
+node_modules/
+dist/
+build/
+out/
+
+# Environment variables
+.env
+.env.local

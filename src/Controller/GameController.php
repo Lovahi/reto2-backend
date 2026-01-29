@@ -36,7 +36,10 @@ class GameController {
     }
     
     public function getGamesPagesCounter(): void {
-        $counter = $this->gameService->getGamesPagesCounter();
+        $filters = $_GET;
+        unset($filters['page']);
+        
+        $counter = $this->gameService->getGamesPagesCounter($filters);
         $this->jsonResponse(['total' => $counter]);
     }
 

@@ -20,7 +20,6 @@ use App\Repository\UserEventRepository;
 use App\Repository\GameRepository;
 
 use App\Enum\Role;
-use App\Enum\Type;
 
 // 1. Configuración de cabeceras (CORS y JSON)
 header("Access-Control-Allow-Origin: *"); //http://localhost:5173
@@ -60,7 +59,7 @@ try {
     $eventController = new EventController($eventService);
 
     $userEventRepository = new UserEventRepository($db);
-    $userEventService = new UserEventService($userEventRepository, $userService);
+    $userEventService = new UserEventService($userEventRepository, $userService, $eventService);
     $userEventController = new UserEventController($userEventService);
 
     $gameRepository = new GameRepository($db);

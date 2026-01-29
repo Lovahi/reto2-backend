@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\GameRepository;
 use App\DTO\GameDTO;
+use App\Core\ImageHelper;
 
 class GameService {
     private GameRepository $GameRepository;
@@ -21,7 +22,7 @@ class GameService {
             $game->getTitle(),
             $game->getGenre(),
             $game->getPlatforms(),
-            $game->getImage(),
+            ImageHelper::getImageUrl($game->getImage(), 'games'),
             $game->getDescription()
         );
     }
@@ -33,13 +34,12 @@ class GameService {
             $game->getTitle(),
             $game->getGenre(),
             $game->getPlatforms(),
-            $game->getImage(),
+            ImageHelper::getImageUrl($game->getImage(), 'games'),
             $game->getDescription()
         ), $games);
     }
 
-    public function getGamesPagesCounter(): int
-    {
-        return $this->GameRepository->getGamesPagesCounter();
+    public function getGamesPagesCounter(array $filters = []): int {
+        return $this->GameRepository->getGamesPagesCounter($filters);
     }
 }

@@ -4,14 +4,17 @@ namespace App\Service;
 
 use App\Repository\UserEventRepository;
 use App\DTO\UserEventDTO;
+use App\Service\EventService;
 
 class UserEventService {
     private UserEventRepository $UserEventRepository;
     private UserService $UserService;
+    private EventService $EventService;
 
-    public function __construct(UserEventRepository $UserEventRepository, UserService $UserService) {
+    public function __construct(UserEventRepository $UserEventRepository, UserService $UserService, EventService $EventService) {
         $this->UserEventRepository = $UserEventRepository;
         $this->UserService = $UserService;
+        $this->EventService = $EventService;
     }
 
     public function getUserEvents(int $id): array {
@@ -35,12 +38,20 @@ class UserEventService {
     public function signUpUserEvent(int $userId, int $eventId): bool {
         $user = $this->UserService->getUserById($userId);
         if (!$user) throw new \Exception("User not found");
-        return $this->UserEventRepository->signUpEvent($user->id, $eventId);
+        
+        if ($this->UserEventRepository->signUpEvent($userId, $eventId)) {
+            return $this->EventService->decrementAvailablePlaces($eventId);
+        }
+        return false;
     }
 
     public function signDownUserEvent(int $userId, int $eventId): bool {
         $user = $this->UserService->getUserById($userId);
         if (!$user) throw new \Exception("User not found");
-        return $this->UserEventRepository->signDownEvent($user->id, $eventId);
+        
+        if ($this->UserEventRepository->signDownEvent($userId, $eventId)) {
+            return $this->EventService->incrementAvailablePlaces($eventId);
+        }
+        return false;
     }
 }

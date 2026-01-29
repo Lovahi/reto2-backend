@@ -11,9 +11,16 @@ trait ApiResponseTrait {
         echo json_encode($data);
     }
 
-    private function getJsonInput(): ?array {
+    private function getRequestInput(): array {
         $json = file_get_contents('php://input');
-        return json_decode($json, true);
+        $data = json_decode($json, true);
+
+        if (!\is_array($data)) {
+            $data = [];
+        }
+
+        // Merge with $_POST and $_FILES to support form-data
+        return [...$data, ...$_POST, ...$_FILES];
     }
 
     private function handleDatabaseException(PDOException $e): void {

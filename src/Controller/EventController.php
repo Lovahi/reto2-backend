@@ -36,14 +36,17 @@ class EventController {
     }
 
     public function getEventsPagesCounter(): void {
-        $counter = $this->eventService->getEventsPagesCounter();
+        $filters = $_GET;
+        unset($filters['page']);
+        
+        $counter = $this->eventService->getEventsPagesCounter($filters);
         $this->jsonResponse(['total' => $counter]);
     }
 
     public function createEvent(): void {
-        $data = $this->getJsonInput();
-
-        if (!$data || !\is_array($data)) {
+        $data = $this->getRequestInput();
+        
+        if (empty($data)) {
             $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
             return;
         }

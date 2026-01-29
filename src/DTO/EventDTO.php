@@ -10,11 +10,11 @@ class EventDTO {
     private Type $type;
     private string $date;
     private string $hour;
-    private string $availablePlaces;
+    private int $availablePlaces;
     private string $image;
     private string $description;
 
-    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, string $availablePlaces, string $image, string $description) {
+    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, int $availablePlaces, string $image, string $description) {
         $this->id = $id;
         $this->title = $title;
         $this->type = $type;
@@ -29,7 +29,7 @@ class EventDTO {
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'date' => $this->date,
             'hour' => $this->hour,
             'availablePlaces' => $this->availablePlaces,

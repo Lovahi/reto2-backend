@@ -10,11 +10,11 @@ class Event {
     private Type $type;
     private string $date;
     private string $hour;
-    private string $availablePlaces;
+    private int $availablePlaces;
     private string $image;
     private string $description;
 
-    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, string $availablePlaces, string $image, string $description) {
+    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, int $availablePlaces, string $image, string $description) {
         $this->id = $id;
         $this->title = $title;
         $this->type = $type;
@@ -41,8 +41,8 @@ class Event {
     public function getHour(): string { return $this->hour; }
     public function setHour(string $hour): void { $this->hour = $hour; }
 
-    public function getAvailablePlaces(): string { return $this->availablePlaces; }
-    public function setAvailablePlaces(string $availablePlaces): void { $this->availablePlaces = $availablePlaces; }
+    public function getAvailablePlaces(): int { return $this->availablePlaces; }
+    public function setAvailablePlaces(int $availablePlaces): void { $this->availablePlaces = $availablePlaces; }
 
     public function getImage(): string { return $this->image; }
     public function setImage(string $image): void { $this->image = $image; }
@@ -54,7 +54,7 @@ class Event {
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'date' => $this->date,
             'hour' => $this->hour,
             'availablePlaces' => $this->availablePlaces,

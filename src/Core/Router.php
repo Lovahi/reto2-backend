@@ -80,6 +80,6 @@ class Router {
     private function sendNotFound(): void {
         \http_response_code(404);
         \header('Content-Type: application/json');
-        echo \json_encode(['error' => $message ?? 'Route not found']);
+        echo \json_encode(['error' => 'Route not found']);
     }
 }
