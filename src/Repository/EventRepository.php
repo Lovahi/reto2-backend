@@ -55,7 +55,7 @@ class EventRepository
 
         $page = max(1, $page);
         $offset = ($page - 1) * $limit;
-        $sql .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $sql .= " LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
         
