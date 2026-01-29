@@ -5,24 +5,18 @@ namespace App\Controller;
 use App\Service\AuthService;
 use Exception;
 use PDOException;
+use App\Core\ApiResponseTrait;
 
 class AuthController {
+    use ApiResponseTrait;
+
     private AuthService $authService;
 
     public function __construct(AuthService $authService) {
         $this->authService = $authService;
     }
 
-    private function jsonResponse(mixed $data, int $status = 200): void {
-        \header('Content-Type: application/json; charset=UTF-8');
-        \http_response_code($status);
-        echo \json_encode($data);
-    }
 
-    private function getJsonInput(): ?array {
-        $json = \file_get_contents('php://input');
-        return \json_decode($json, true);
-    }
 
     public function register(): void {
         $data = $this->getJsonInput();
@@ -39,11 +33,7 @@ class AuthController {
                 $this->jsonResponse(['error' => 'Failed to register user'], 400);
             }
         } catch (PDOException $e) {
-            if ($e->getCode() == 23000) {
-                $this->jsonResponse(['error' => 'The username or email is already in use'], 400);
-            } else {
-                $this->jsonResponse(['error' => 'A database error occurred'], 500);
-            }
+            $this->handleDatabaseException($e);
         } catch (Exception $e) {
             $this->jsonResponse(['error' => $e->getMessage()], 400);
         }
