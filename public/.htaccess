@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# CORS Headers para todas las respuestas
+Header set Access-Control-Allow-Origin "http://localhost:5173"
+Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+Header always set Access-Control-Allow-Credentials "true"
+Header always set Access-Control-Max-Age "3600"
+
+# Responder inmediatamente a OPTIONS con 200 OK (Preflight)
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^ - [R=200,L]
+
+# Evitar procesar archivos y directorios reales (como imágenes, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirigir todo lo demás a index.php pasando la URL como un parámetro para el router
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]

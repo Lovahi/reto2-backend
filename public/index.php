@@ -21,17 +21,8 @@ use App\Repository\GameRepository;
 
 use App\Enum\Role;
 
-// 1. Configuración de cabeceras (CORS y JSON)
-header("Access-Control-Allow-Origin: *"); //http://localhost:5173
+// 1. Configuración de cabeceras (JSON)
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-// Manejo de peticiones preflight
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
 
 // 2. Autoloader PSR-4 Simplificado
 spl_autoload_register(function ($class) {
@@ -98,8 +89,9 @@ try {
     $router->add('GET',    '/api/games/pages',             [$gameController, 'getGamesPagesCounter']);
     $router->add('GET',    '/api/games/{id}',              [$gameController, 'getGamesById']);
 
-    // 5. Ejecución
-    $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+    // 5. Ejecución - Usamos la URL proporcionada por el .htaccess para un ruteo limpio
+    $uri = isset($_GET['url']) ? '/' . $_GET['url'] : $_SERVER['REQUEST_URI'];
+    $router->dispatch($_SERVER['REQUEST_METHOD'], $uri);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
