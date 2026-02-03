@@ -10,13 +10,11 @@ class Database {
 
     public static function getConnection(): PDO {
         if (self::$instance === null) {
-            // En un entorno real, esto vendría de un archivo .env o config.php
-            // Cuando tengamos que hacer despligue en Docker, se cambia.
             $config = [
-                'host' => 'localhost',
-                'db'   => 'gamefest',
-                'user' => 'root',
-                'pass' => '',
+                'host' => \getenv('DB_HOST') ?: 'localhost',
+                'db'   => \getenv('DB_NAME') ?: 'gamefest',
+                'user' => \getenv('DB_USER') ?: 'root',
+                'pass' => \getenv('DB_PASS') !== false ? \getenv('DB_PASS') : '',
                 'charset' => 'utf8'
             ];
 

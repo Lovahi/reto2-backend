@@ -4,6 +4,7 @@ session_start();
 
 use App\Core\Router;
 use App\Core\Database;
+use App\Core\DotEnv;
 use App\Controller\UserController;
 use App\Controller\AuthController;
 use App\Controller\EventController;
@@ -34,6 +35,9 @@ spl_autoload_register(function ($class) {
     $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
     if (file_exists($file)) require $file;
 });
+
+// 2.5 Cargar variables de entorno
+DotEnv::load(__DIR__ . '/../.env');
 
 // 3. Inicialización de dependencias
 try {
