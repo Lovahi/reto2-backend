@@ -44,6 +44,11 @@ class EventController {
     }
 
     public function createEvent(): void {
+        $userId = $_SESSION['user_id'] ?? null;
+        if (!$userId) {
+            $this->jsonResponse(['error' => 'User not authenticated'], 401);
+            return;
+        }
         $data = $this->getRequestInput();
         
         if (empty($data)) {
@@ -52,7 +57,7 @@ class EventController {
         }
 
         try {
-            if ($this->eventService->createEvent($data)) {
+            if ($this->eventService->createEvent($data, $userId)) {
                 $this->jsonResponse(['message' => 'Event created successfully'], 201);
             } else {
                 $this->jsonResponse(['error' => 'Failed to create event'], 400);
