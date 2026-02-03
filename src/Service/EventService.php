@@ -50,7 +50,7 @@ class EventService {
         return $this->eventRepository->getEventsPagesCounter($filters);
     }
 
-    public function createEvent(array $data): bool {
+    public function createEvent(array $data, int $createdBy): bool {
         if (empty($data['title']) || empty($data['type']) || empty($data['date']) || empty($data['hour']) || empty($data['availablePlaces']) || empty($data['image']) || empty($data['description'])) {
             throw new \Exception("Missing required fields: title, type, date, hour, availablePlaces, image, description");
         }
@@ -63,7 +63,8 @@ class EventService {
             $data['hour'],
             $data['availablePlaces'],
             ImageHelper::saveImage($data['image'], 'events'),
-            $data['description']
+            $data['description'],
+            $createdBy
         );
 
         return $this->eventRepository->createEvent($event);

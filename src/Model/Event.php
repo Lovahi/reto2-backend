@@ -13,8 +13,9 @@ class Event {
     private int $availablePlaces;
     private string $image;
     private string $description;
+    private int $createdBy;
 
-    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, int $availablePlaces, string $image, string $description) {
+    public function __construct(?int $id, string $title, Type $type, string $date, string $hour, int $availablePlaces, string $image, string $description, int $createdBy) {
         $this->id = $id;
         $this->title = $title;
         $this->type = $type;
@@ -23,6 +24,7 @@ class Event {
         $this->availablePlaces = $availablePlaces;
         $this->image = $image;
         $this->description = $description;
+        $this->createdBy = $createdBy;
     }
 
     // Getters and Setters
@@ -49,7 +51,10 @@ class Event {
 
     public function getDescription(): string { return $this->description; }
     public function setDescription(string $description): void { $this->description = $description; }
-
+    
+    public function getCreatedBy(): int { return $this->createdBy; }
+    public function setCreatedBy(int $createdBy): void { $this->createdBy = $createdBy; }
+    
     public function toArray(): array {
         return [
             'id' => $this->id,
@@ -59,7 +64,8 @@ class Event {
             'hour' => $this->hour,
             'availablePlaces' => $this->availablePlaces,
             'image' => $this->image,
-            'description' => $this->description
+            'description' => $this->description,
+            'createdBy' => $this->createdBy
         ];
     }
 }

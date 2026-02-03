@@ -108,7 +108,7 @@ class EventRepository
     }
 
     public function createEvent(Event $event): bool {
-        $stmt = $this->db->prepare("INSERT INTO events (titulo, tipo, fecha, hora, plazasLibres, imagen, descripcion) VALUES (:titulo, :tipo, :fecha, :hora, :plazasLibres, :imagen, :descripcion)");
+        $stmt = $this->db->prepare("INSERT INTO events (titulo, tipo, fecha, hora, plazasLibres, imagen, descripcion, created_by) VALUES (:titulo, :tipo, :fecha, :hora, :plazasLibres, :imagen, :descripcion, :created_by)");
         $result = $stmt->execute([
             'titulo' => $event->getTitle(),
             'tipo' => $event->getType()->value,
@@ -117,6 +117,7 @@ class EventRepository
             'plazasLibres' => $event->getAvailablePlaces(),
             'imagen' => $event->getImage(),
             'descripcion' => $event->getDescription(),
+            'created_by' => $event->getCreatedBy(),
         ]);
         if ($result) {
             $event->setId((int) $this->db->lastInsertId());
