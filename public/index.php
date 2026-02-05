@@ -96,10 +96,12 @@ try {
     // 5. Ejecución - Usamos la URL proporcionada por el .htaccess para un ruteo limpio
     $uri = isset($_GET['url']) ? '/' . $_GET['url'] : $_SERVER['REQUEST_URI'];
     $router->dispatch($_SERVER['REQUEST_METHOD'], $uri);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     http_response_code(500);
     echo json_encode([
         'error' => 'An unexpected error occurred',
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
     ]);
 }

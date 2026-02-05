@@ -56,7 +56,7 @@ class GameRepository {
         $stmt = $this->db->prepare($sql);
         
         foreach ($params as $key => $val) {
-            $stmt->bindValue($key, $val);
+            $stmt->bindValue(":$key", $val);
         }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
