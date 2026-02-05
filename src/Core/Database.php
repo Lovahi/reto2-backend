@@ -15,7 +15,7 @@ class Database {
                 'db'   => \getenv('DB_NAME') ?: 'gamefest',
                 'user' => \getenv('DB_USER') ?: 'root',
                 'pass' => \getenv('DB_PASS') !== false ? \getenv('DB_PASS') : '',
-                'charset' => 'utf8'
+                'charset' => 'utf8mb4'
             ];
 
             $dsn = "mysql:host={$config['host']};dbname={$config['db']};charset={$config['charset']}";
