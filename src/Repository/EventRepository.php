@@ -30,7 +30,8 @@ class EventRepository
             $row['hora'],
             (int) $row['plazasLibres'],
             $row['imagen'],
-            $row['descripcion']
+            $row['descripcion'],
+            (int) $row['created_by']
         );
     }
 
@@ -77,7 +78,8 @@ class EventRepository
                 $row['hora'],
                 (int) $row['plazasLibres'],
                 $row['imagen'],
-                $row['descripcion']
+                $row['descripcion'],
+                (int) $row['created_by']
             );
         }
         return $events;
