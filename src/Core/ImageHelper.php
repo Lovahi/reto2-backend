@@ -10,7 +10,7 @@ class ImageHelper {
     public static function getImageUrl(?string $imageName, string $subFolder): string {
         if (!$imageName) return "";
         
-        $filePath = __DIR__ . "/../../public/img/{$subFolder}/{$imageName}";
+        $filePath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . $subFolder . DIRECTORY_SEPARATOR . $imageName;
         
         if (!\file_exists($filePath)) {
             return "";
@@ -27,14 +27,34 @@ class ImageHelper {
      * @return string Nombre del archivo guardado o vacío si falla.
      */
     public static function saveImage(?array $file, string $subFolder): string {
-        if (!$file || !isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+        if (!$file || !isset($file['tmp_name'])) {
             return "";
         }
 
-        $targetDir = __DIR__ . "/../../public/img/{$subFolder}/";
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $errors = [
+                UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+                UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+                UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded',
+                UPLOAD_ERR_NO_FILE    => 'No file was uploaded',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                UPLOAD_ERR_EXTENSION  => 'A PHP extension stopped the file upload.',
+            ];
+            $message = $errors[$file['error']] ?? 'Unknown upload error';
+            throw new \Exception("Upload error: " . $message);
+        }
+
+        $targetDir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . $subFolder . DIRECTORY_SEPARATOR;
         
         if (!\is_dir($targetDir)) {
-            \mkdir($targetDir, 0777, true);
+            if (!\mkdir($targetDir, 0777, true)) {
+                throw new \Exception("Could not create directory {$targetDir}");
+            }
+        }
+
+        if (!\is_writable($targetDir)) {
+            throw new \Exception("Directory {$targetDir} is not writable.");
         }
 
         // 1. Validar MIME real
@@ -47,11 +67,10 @@ class ImageHelper {
             throw new \Exception("The uploaded file is not a valid image ({$mime}).");
         }
 
-        // 2. Añadimos el nombre archivo
-        $baseName = \pathinfo($file['name'], PATHINFO_FILENAME);
+        // 2. Generar nombre de archivo único
+        $baseName = preg_replace('/[^A-Za-z0-9_\-\.]/', '_', \pathinfo($file['name'], PATHINFO_FILENAME));
         $extension = \pathinfo($file['name'], PATHINFO_EXTENSION);
         if (empty($extension)) {
-            // Si no tiene extensión, la deducimos del MIME
             $extensions = [
                 'image/jpeg' => 'jpg',
                 'image/png'  => 'png',
@@ -60,14 +79,15 @@ class ImageHelper {
             ];
             $extension = $extensions[$mime] ?? 'jpg';
         }
-        $filename = \str_replace(' ', '-', $baseName) . ".{$extension}";
-        $targetPath = "{$targetDir}{$filename}";
+
+        $filename = uniqid() . '-' . $baseName . ".{$extension}";
+        $targetPath = $targetDir . $filename;
 
         // 3. Mover el archivo
         if (\move_uploaded_file($file['tmp_name'], $targetPath)) {
             return $filename;
         }
 
-        return "";
+        throw new \Exception("Failed to move uploaded file to {$targetPath}. Check directory permissions.");
     }
 }

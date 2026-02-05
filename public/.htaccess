@@ -1,18 +1,5 @@
 RewriteEngine On
 
-# CORS Headers - Protegido por IfModule para evitar Error 500 si el módulo no está activo
-<IfModule mod_headers.c>
-    Header always set Access-Control-Allow-Origin "http://10.0.56.66"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
-    Header always set Access-Control-Allow-Credentials "true"
-    Header always set Access-Control-Max-Age "3600"
-</IfModule>
-
-# Responder inmediatamente a OPTIONS con 200 OK (Preflight)
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^ - [R=200,L]
-
 # Evitar procesar archivos y directorios reales
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

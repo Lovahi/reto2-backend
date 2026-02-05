@@ -48,7 +48,10 @@ class AuthController {
         try {
             $userDto = $this->authService->login($data['email'], $data['password']);
             if ($userDto) {
-                $this->jsonResponse($userDto);
+                $this->jsonResponse([
+                    'message' => 'Login successful',
+                    'user' => $userDto->toArray()
+                ]);
             } else {
                 $this->jsonResponse(['error' => 'Invalid email or password'], 401);
             }

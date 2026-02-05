@@ -55,6 +55,9 @@ class EventService {
             throw new \Exception("Missing required fields: title, type, date, hour, availablePlaces, image, description");
         }
 
+        $imageData = $data['image'] ?? null;
+        $imageName = is_array($imageData) ? ImageHelper::saveImage($imageData, 'events') : (is_string($imageData) ? $imageData : '');
+
         $event = new Event(
             null,
             $data['title'],
@@ -62,7 +65,7 @@ class EventService {
             $data['date'],
             $data['hour'],
             $data['availablePlaces'],
-            ImageHelper::saveImage($data['image'], 'events'),
+            $imageName,
             $data['description'],
             $createdBy
         );

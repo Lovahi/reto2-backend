@@ -52,7 +52,14 @@ class EventController {
         $data = $this->getRequestInput();
         
         if (empty($data)) {
-            $this->jsonResponse(['error' => 'Invalid JSON or empty body'], 400);
+            $this->jsonResponse([
+                'error' => 'Invalid JSON or empty body',
+                'debug' => [
+                    'post' => $_POST,
+                    'files' => $_FILES,
+                    'method' => $_SERVER['REQUEST_METHOD']
+                ]
+            ], 400);
             return;
         }
 

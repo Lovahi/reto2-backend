@@ -20,7 +20,7 @@ trait ApiResponseTrait {
         }
 
         // Merge with $_POST and $_FILES to support form-data
-        return [...$data, ...$_POST, ...$_FILES];
+        return \array_merge($data, $_POST, $_FILES);
     }
 
     private function handleDatabaseException(PDOException $e): void {

@@ -31,7 +31,7 @@ class EventRepository
             (int) $row['plazasLibres'],
             $row['imagen'],
             $row['descripcion'],
-            (int) ($row['created_by'] ?? 1) // Added missing argument
+            (int) $row['created_by']
         );
     }
 
@@ -79,7 +79,7 @@ class EventRepository
                 (int) $row['plazasLibres'],
                 $row['imagen'],
                 $row['descripcion'],
-                (int) ($row['created_by'] ?? 1) // Added missing argument
+                (int) $row['created_by']
             );
         }
         return $events;
